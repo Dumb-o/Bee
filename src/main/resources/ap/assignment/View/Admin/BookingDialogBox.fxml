@@ -23,7 +23,7 @@
     <TextField fx:id="packageField" />
 
     <Label text="Guide:" />
-    <TextField fx:id="guideField" />
+    <ComboBox fx:id="guideComboBox" promptText="Select a guide (optional)" />
 
     <Label text="Travel Date:" />
     <DatePicker fx:id="travelDateField" />

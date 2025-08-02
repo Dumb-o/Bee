@@ -1,0 +1,16 @@
+[
+  {
+    "id": "G001",
+    "name": "John Smith",
+    "contact": "+1-555-0123",
+    "email": "john.smith@example.com",
+    "nationality": "American"
+  },
+  {
+    "id": "1",
+    "name": "admin@admin",
+    "contact": "admin@admin",
+    "email": "admin@admin.com",
+    "nationality": "admin@admin"
+  }
+]

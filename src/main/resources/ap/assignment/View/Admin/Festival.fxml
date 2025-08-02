@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+
+<AnchorPane prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/24.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="Admin.FestivalController">
+
+    <VBox prefHeight="400" prefWidth="600" spacing="10">
+
+        <padding>
+            <Insets bottom="10" left="10" right="10" top="10" />
+        </padding>
+
+        <!-- Title -->
+        <Label style="-fx-font-weight: bold; -fx-font-size: 18px;" text="Festival Management" />
+
+        <!-- Buttons -->
+        <HBox spacing="10">
+            <Button onAction="#addFestival" style="-fx-background-color: #4CAF50; -fx-text-fill: white;" text="Add Festival" />
+            <Button onAction="#updateFestival" style="-fx-background-color: #2196F3; -fx-text-fill: white;" text="Update Festival" />
+            <Button onAction="#deleteFestival" style="-fx-background-color: #f44336; -fx-text-fill: white;" text="Delete Festival" />
+        </HBox>
+
+        <!-- Festival Table -->
+        <TableView fx:id="festivalTable" VBox.vgrow="ALWAYS">
+            <columns>
+                <TableColumn fx:id="idColumn" prefWidth="100" text="Festival ID" />
+                <TableColumn fx:id="nameColumn" prefWidth="150" text="Festival Name" />
+                <TableColumn fx:id="dateFromColumn" prefWidth="120" text="Date From" />
+                <TableColumn fx:id="dateToColumn" prefWidth="120" text="Date To" />
+                <TableColumn fx:id="discountColumn" prefWidth="100" text="Discount (%)" />
+            </columns>
+        </TableView>
+
+    </VBox>
+
+</AnchorPane> 

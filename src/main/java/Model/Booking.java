@@ -2,45 +2,39 @@ package Model;
 
 import com.google.gson.annotations.Expose;
 import javafx.beans.property.*;
-
 import java.time.LocalDate;
+import java.io.InputStreamReader;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.reflect.TypeToken;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+import java.lang.reflect.Type;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Booking {
 
-    // Private fields for JSON serialization
-    @Expose
-    private int id;
-    @Expose
-    private String tourist;
-    @Expose
-    private String packageName;
-    @Expose
-    private String guide;
-    @Expose
-    private String travelDate;
-    @Expose
-    private double amount;
+    @Expose private int id;
+    @Expose private String tourist;
+    @Expose private String packageName;
+    @Expose private String guide;
+    @Expose private String travelDate;
+    @Expose private double amount;
 
-    // JavaFX properties for UI binding
-    private IntegerProperty idProperty;
-    private StringProperty touristProperty;
-    private StringProperty packageNameProperty;
-    private StringProperty guideProperty;
-    private ObjectProperty<LocalDate> travelDateProperty;
-    private DoubleProperty amountProperty;
+    private final IntegerProperty idProperty = new SimpleIntegerProperty();
+    private final StringProperty touristProperty = new SimpleStringProperty();
+    private final StringProperty packageNameProperty = new SimpleStringProperty();
+    private final StringProperty guideProperty = new SimpleStringProperty();
+    private final ObjectProperty<LocalDate> travelDateProperty = new SimpleObjectProperty<>();
+    private final DoubleProperty amountProperty = new SimpleDoubleProperty();
 
     // Default constructor for Gson
     public Booking() {
-        this.id = 0;
-        this.tourist = "";
-        this.packageName = "";
-        this.guide = "";
-        this.travelDate = "";
-        this.amount = 0.0;
-        initializeProperties();
+        setupProperties();
     }
 
-    // Constructor
+    // Main constructor
     public Booking(int id, String tourist, String packageName, String guide, LocalDate travelDate, double amount) {
         this.id = id;
         this.tourist = tourist;
@@ -48,119 +42,56 @@ public class Booking {
         this.guide = guide;
         this.travelDate = travelDate.toString();
         this.amount = amount;
-        initializeProperties();
+        setupProperties();
     }
 
-    private void initializeProperties() {
-        this.idProperty = new SimpleIntegerProperty(id);
-        this.touristProperty = new SimpleStringProperty(tourist);
-        this.packageNameProperty = new SimpleStringProperty(packageName);
-        this.guideProperty = new SimpleStringProperty(guide);
-        
-        // Handle empty travel date
+    private void setupProperties() {
+        this.idProperty.set(this.id);
+        this.touristProperty.set(this.tourist);
+        this.packageNameProperty.set(this.packageName);
+        this.guideProperty.set(this.guide);
+
         LocalDate parsedDate = null;
-        if (travelDate != null && !travelDate.isEmpty()) {
+        if (this.travelDate != null && !this.travelDate.isEmpty()) {
             try {
-                parsedDate = LocalDate.parse(travelDate);
+                parsedDate = LocalDate.parse(this.travelDate);
             } catch (Exception e) {
-                parsedDate = LocalDate.now(); // Default to today if parsing fails
             }
-        } else {
-            parsedDate = LocalDate.now(); // Default to today if empty
         }
-        this.travelDateProperty = new SimpleObjectProperty<>(parsedDate);
-        
-        this.amountProperty = new SimpleDoubleProperty(amount);
+        this.travelDateProperty.set(parsedDate);
+        this.amountProperty.set(this.amount);
     }
 
-    // Getters and setters for String fields
-    public int getId() {
-        return id;
-    }
+    public static ObservableList<Booking> loadBookings() {
+        try (InputStreamReader reader = new InputStreamReader(Booking.class.getResourceAsStream("/Data/bookings.json"))) {
+            Gson gson = new GsonBuilder().setPrettyPrinting().create();
+            Type listType = new TypeToken<List<Booking>>() {}.getType();
+            List<Booking> list = gson.fromJson(reader, listType);
 
-    public IntegerProperty idProperty() {
-        return idProperty;
-    }
-
-    public void setId(int id) {
-        this.id = id;
-        if (idProperty != null) {
-            idProperty.set(id);
+            if (list != null) {
+                list.forEach(Booking::setupProperties);
+                return FXCollections.observableArrayList(list);
+            }
+            return FXCollections.observableArrayList();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return FXCollections.observableArrayList();
         }
     }
 
-    public String getTourist() {
-        return tourist;
-    }
+    // Getters for properties
+    public IntegerProperty idProperty() { return idProperty; }
+    public StringProperty touristProperty() { return touristProperty; }
+    public StringProperty packageNameProperty() { return packageNameProperty; }
+    public StringProperty guideProperty() { return guideProperty; }
+    public ObjectProperty<LocalDate> travelDateProperty() { return travelDateProperty; }
+    public DoubleProperty amountProperty() { return amountProperty; }
 
-    public StringProperty touristProperty() {
-        return touristProperty;
-    }
-
-    public void setTourist(String tourist) {
-        this.tourist = tourist;
-        if (touristProperty != null) {
-            touristProperty.set(tourist);
-        }
-    }
-
-    public String getPackage() {
-        return packageName;
-    }
-
-    public StringProperty packageProperty() {
-        return packageNameProperty;
-    }
-
-    public void setPackage(String packageName) {
-        this.packageName = packageName;
-        if (packageNameProperty != null) {
-            packageNameProperty.set(packageName);
-        }
-    }
-
-    public String getGuide() {
-        return guide;
-    }
-
-    public StringProperty guideProperty() {
-        return guideProperty;
-    }
-
-    public void setGuide(String guide) {
-        this.guide = guide;
-        if (guideProperty != null) {
-            guideProperty.set(guide);
-        }
-    }
-
-    public LocalDate getTravelDate() {
-        return LocalDate.parse(travelDate);
-    }
-
-    public ObjectProperty<LocalDate> travelDateProperty() {
-        return travelDateProperty;
-    }
-
-    public void setTravelDate(LocalDate travelDate) {
-        this.travelDate = travelDate.toString();
-        if (travelDateProperty != null) {
-            travelDateProperty.set(travelDate);
-        }
-    }
-
-    public double getAmount() {
-        return amount;
-    }
-
-    public DoubleProperty amountProperty() {
-        return amountProperty;
-    }
-
-    public void setAmount(double amount) {
-        this.amount = amount;
-        if (amountProperty != null) {
-            amountProperty.set(amount);
-        }
-    }
+    // Getters for TableView, which will use the properties
+    public int getId() { return idProperty.get(); }
+    public String getTourist() { return touristProperty.get(); }
+    public String getPackageName() { return packageNameProperty.get(); }
+    public String getGuide() { return guideProperty.get(); }
+    public LocalDate getTravelDate() { return travelDateProperty.get(); }
+    public double getAmount() { return amountProperty.get(); }
 }

@@ -14,10 +14,13 @@ import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXMLLoader;
 import javafx.stage.Stage;
+import javafx.scene.control.cell.PropertyValueFactory; // Import added
 
-import java.io.FileReader;
+import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.lang.reflect.Type;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
@@ -58,14 +61,17 @@ public class BookingsController {
     private Button deleteButton;
 
     private ObservableList<Booking> bookingsList = FXCollections.observableArrayList();
-    private static final String BOOKING_FILE_PATH = "src/main/resources/Data/bookings.json";
+    private static final String DATA_DIR = "Data";
+    private static final String BOOKING_FILE_NAME = "bookings.json";
+    private static final String BOOKING_FILE_PATH = DATA_DIR + File.separator + BOOKING_FILE_NAME;
 
     @FXML
     public void initialize() {
         // Initialize the columns with correct property bindings
         idColumn.setCellValueFactory(cellData -> cellData.getValue().idProperty().asObject());
         touristColumn.setCellValueFactory(cellData -> cellData.getValue().touristProperty());
-        packageColumn.setCellValueFactory(cellData -> cellData.getValue().packageProperty());
+        // Corrected: Uses packageNameProperty() to match the Booking model
+        packageColumn.setCellValueFactory(cellData -> cellData.getValue().packageNameProperty());
         guideColumn.setCellValueFactory(cellData -> cellData.getValue().guideProperty());
 
         // Format LocalDate into String for TableColumn
@@ -75,13 +81,14 @@ public class BookingsController {
         amountColumn.setCellValueFactory(cellData -> cellData.getValue().amountProperty().asObject());
 
         bookingsTable.setItems(bookingsList);
-        
+
         // Load existing bookings
         loadBookings();
     }
 
     private void loadBookings() {
-        try (FileReader reader = new FileReader(BOOKING_FILE_PATH)) {
+        try (InputStream is = getClass().getResourceAsStream("/Data/" + BOOKING_FILE_NAME);
+             InputStreamReader reader = new InputStreamReader(is)) {
             Gson gson = new GsonBuilder()
                 .excludeFieldsWithoutExposeAnnotation()
                 .create();
@@ -92,19 +99,24 @@ public class BookingsController {
             if (bookingData != null) {
                 bookingsList.addAll(bookingData);
             }
-        } catch (IOException e) {
+        } catch (Exception e) {
             System.out.println("No existing bookings found or error loading bookings: " + e.getMessage());
         }
     }
 
     private void saveBookings() {
-        try (FileWriter writer = new FileWriter(BOOKING_FILE_PATH)) {
+        File dataDir = new File(DATA_DIR);
+        if (!dataDir.exists()) {
+            dataDir.mkdir();
+        }
+        File bookingsFile = new File(DATA_DIR, BOOKING_FILE_NAME);
+        try (FileWriter writer = new FileWriter(bookingsFile)) {
             Gson gson = new GsonBuilder()
                 .setPrettyPrinting()
                 .excludeFieldsWithoutExposeAnnotation()
                 .create();
             gson.toJson(bookingsList, writer);
-            System.out.println("Bookings saved to " + BOOKING_FILE_PATH);
+            System.out.println("Bookings saved to " + bookingsFile.getAbsolutePath());
         } catch (IOException e) {
             e.printStackTrace();
             showAlert("Error", "Failed to save bookings to file.");

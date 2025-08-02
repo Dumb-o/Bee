@@ -15,9 +15,11 @@ import javafx.scene.control.*;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 
-import java.io.FileReader;
+import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.lang.reflect.Type;
 import java.util.List;
 
@@ -42,7 +44,8 @@ public class FestivalController {
     private TableColumn<Festival, Number> discountColumn;
 
     private ObservableList<Festival> festivalList = FXCollections.observableArrayList();
-    private static final String FESTIVAL_FILE_PATH = "src/main/resources/Data/festivals.json";
+    private static final String DATA_DIR = "Data";
+    private static final String FESTIVAL_FILE_NAME = "festivals.json";
 
     // Initialize the FestivalTableView with the data
     @FXML
@@ -146,38 +149,43 @@ public class FestivalController {
     }
 
     private void loadFestivalData() {
-        try (FileReader reader = new FileReader(FESTIVAL_FILE_PATH)) {
+        try (
+            InputStream is = getClass().getResourceAsStream("/Data/" + FESTIVAL_FILE_NAME);
+            InputStreamReader reader = new InputStreamReader(is);
+        ) {
             Gson gson = new GsonBuilder()
                 .excludeFieldsWithoutExposeAnnotation()
                 .create();
             Type festivalListType = new TypeToken<List<Festival>>(){}.getType();
             List<Festival> festivalData = gson.fromJson(reader, festivalListType);
 
-            // Clear the existing list
             festivalList.clear();
 
-            // Add festivals to the ObservableList
             if (festivalData != null) {
                 festivalList.addAll(festivalData);
             }
 
-            // Set the table items to the festival list
             festivalTable.setItems(festivalList);
 
-        } catch (IOException e) {
-            e.printStackTrace();
-            showAlert("Error", "Failed to load festival data from the file.");
+        } catch (Exception e) {
+            System.out.println("No existing festivals found or error loading festivals.");
         }
     }
 
     private void saveFestivalData() {
-        try (FileWriter writer = new FileWriter(FESTIVAL_FILE_PATH)) {
+        File dataDir = new File(DATA_DIR);
+        if (!dataDir.exists()) {
+            dataDir.mkdir();
+        }
+        File festivalsFile = new File(DATA_DIR, FESTIVAL_FILE_NAME);
+
+        try (FileWriter writer = new FileWriter(festivalsFile)) {
             Gson gson = new GsonBuilder()
                 .setPrettyPrinting()
                 .excludeFieldsWithoutExposeAnnotation()
                 .create();
             gson.toJson(festivalList, writer);
-            System.out.println("Festival data saved to " + FESTIVAL_FILE_PATH);
+            System.out.println("Festival data saved to " + festivalsFile.getAbsolutePath());
 
         } catch (IOException e) {
             e.printStackTrace();
@@ -192,4 +200,4 @@ public class FestivalController {
         alert.setContentText(content);
         alert.showAndWait();
     }
-} 
+}

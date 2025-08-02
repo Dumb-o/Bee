@@ -21,9 +21,7 @@ import javafx.scene.control.TableView;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
 import java.lang.reflect.Type;
 import java.time.LocalDate;
 import java.util.List;
@@ -51,32 +49,25 @@ public class StaffController {
     @FXML
     private Button deleteButton;
 
-    // ObservableList to hold the staff data
     private ObservableList<Staff> staffList = FXCollections.observableArrayList();
 
-    // File path to load staff data from
-    private static final String STAFF_FILE_PATH = "src/main/resources/Data/staff.json";
+    private static final String DATA_DIR = "Data";
+    private static final String STAFF_FILE_NAME = "staff.json";
+    private static final String STAFF_FILE_PATH = DATA_DIR + File.separator + STAFF_FILE_NAME;
 
-    // Initialize the StaffTableView with the data
     @FXML
     public void initialize() {
-        // Initialize the columns with proper property bindings
         nameColumn.setCellValueFactory(cellData -> cellData.getValue().nameProperty());
         contactColumn.setCellValueFactory(cellData -> cellData.getValue().phoneProperty());
         emailColumn.setCellValueFactory(cellData -> cellData.getValue().emailProperty());
 
-        // Load and display staff data
         loadStaffData();
     }
 
-    /**
-     * Loads staff data from the JSON file.
-     * It uses a GsonBuilder to register custom adapters for LocalDate and StringProperty,
-     * which are required to correctly deserialize the data.
-     */
     private void loadStaffData() {
-        try (FileReader reader = new FileReader(STAFF_FILE_PATH)) {
-            // Use GsonBuilder to register ALL custom adapters
+        try (InputStream is = getClass().getResourceAsStream("/Data/staff.json");
+             InputStreamReader reader = new InputStreamReader(is)) {
+
             Gson gson = new GsonBuilder()
                     .registerTypeAdapter(LocalDate.class, new LocalDateAdapter())
                     .registerTypeAdapter(StringProperty.class, new StringPropertyAdapter())
@@ -85,10 +76,8 @@ public class StaffController {
             Type staffListType = new TypeToken<List<Staff>>(){}.getType();
             List<Staff> staffData = gson.fromJson(reader, staffListType);
 
-            // Clear the existing list
             staffList.clear();
 
-            // Filter out staff with email containing "@admin" and add to the ObservableList
             if (staffData != null) {
                 for (Staff staff : staffData) {
                     if (staff.getEmail() != null && !staff.getEmail().contains("@admin")) {
@@ -96,19 +85,13 @@ public class StaffController {
                     }
                 }
             }
-
-            // Set the table items to the filtered staff list
             staffTable.setItems(staffList);
 
-        } catch (IOException e) {
-            e.printStackTrace();
-            showAlert("Error", "Failed to load staff data from the file.");
+        } catch (Exception e) {
+            System.err.println("Failed to load staff data from the file.");
         }
     }
 
-    /**
-     * Handles adding a new staff member by opening a dialog box.
-     */
     @FXML
     private void handleAddStaff(ActionEvent event) {
         try {
@@ -122,7 +105,7 @@ public class StaffController {
             dialogStage.setScene(new Scene(root));
 
             StaffDialogBoxController dialogController = loader.getController();
-            dialogController.setStaffController(this); // Pass a reference to this controller
+            dialogController.setStaffController(this);
 
             dialogStage.showAndWait();
 
@@ -132,13 +115,9 @@ public class StaffController {
         }
     }
 
-    /**
-     * This method is called by the StaffDialogBoxController when a new staff member is created.
-     * @param newStaff The new staff object to add to the table.
-     */
     public void addNewStaff(Staff newStaff) {
         staffList.add(newStaff);
-        saveStaffData(); // Save the updated list to the file
+        saveStaffData();
     }
 
     @FXML
@@ -146,7 +125,6 @@ public class StaffController {
         Staff selectedStaff = staffTable.getSelectionModel().getSelectedItem();
         if (selectedStaff != null) {
             System.out.println("Update Staff for: " + selectedStaff.getName());
-            // Implement update logic here
         } else {
             showAlert("No Selection", "Please select a staff member to update.");
         }
@@ -158,54 +136,45 @@ public class StaffController {
         if (selectedStaff != null) {
             staffList.remove(selectedStaff);
             System.out.println("Deleted Staff with Email: " + selectedStaff.getEmail());
-            // After deleting, save the updated staff data back to the file
             saveStaffData();
         } else {
             showAlert("No Selection", "Please select a staff member to delete.");
         }
     }
 
-    /**
-     * Saves the staff data back to the JSON file.
-     * This method first reads the admin user(s) from the file and then combines them
-     * with the current state of the `staffList` (which reflects UI changes) before saving.
-     */
     private void saveStaffData() {
+        File dataDir = new File(DATA_DIR);
+        if (!dataDir.exists()) {
+            dataDir.mkdir();
+        }
+
         try (FileWriter writer = new FileWriter(STAFF_FILE_PATH)) {
-            // Create a Gson instance with custom adapters
             Gson gson = new GsonBuilder()
                     .registerTypeAdapter(LocalDate.class, new LocalDateAdapter())
                     .registerTypeAdapter(StringProperty.class, new StringPropertyAdapter())
                     .setPrettyPrinting()
                     .create();
 
-            // 1. Create a temporary list to hold the complete data for saving
             ObservableList<Staff> staffToSave = FXCollections.observableArrayList();
 
-            // 2. Read the admin user(s) from the existing file
-            try (FileReader reader = new FileReader(STAFF_FILE_PATH)) {
+            try (InputStream is = getClass().getResourceAsStream("/Data/staff.json");
+                 InputStreamReader reader = new InputStreamReader(is)) {
                 Type staffListType = new TypeToken<List<Staff>>(){}.getType();
                 List<Staff> allStaffFromFile = gson.fromJson(reader, staffListType);
 
                 if (allStaffFromFile != null) {
-                    // Add only the admin user(s) to the saving list
                     for (Staff staff : allStaffFromFile) {
                         if (staff.getEmail() != null && staff.getEmail().contains("@admin")) {
                             staffToSave.add(staff);
                         }
                     }
                 }
-            } catch (IOException e) {
-                // If the file doesn't exist, we don't have an admin to save.
-                // An alert is already shown by loadStaffData() in this case.
+            } catch (Exception e) {
                 System.err.println("No existing file to read admin user from.");
             }
 
-            // 3. Add all the non-admin staff from the current `staffList`
-            // This list already has the deleted staff member removed.
             staffToSave.addAll(staffList);
 
-            // 4. Write the complete, merged list to the file
             gson.toJson(staffToSave, writer);
             System.out.println("Staff data saved to " + STAFF_FILE_PATH);
 

@@ -1,9 +1,11 @@
 package Staff;
 
+import Model.Booking;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
+import javafx.scene.control.cell.PropertyValueFactory;
 
 import java.net.URL;
 import java.util.ResourceBundle;
@@ -11,17 +13,17 @@ import java.util.ResourceBundle;
 public class StaffBookingsController implements Initializable {
 
     @FXML
-    private TableView bookingTable;
+    private TableView<Booking> bookingTable;
     @FXML
-    private TableColumn customerNameColumn;
+    private TableColumn<Booking, String> customerNameColumn;
     @FXML
-    private TableColumn attractionNameColumn;
+    private TableColumn<Booking, String> attractionNameColumn;
     @FXML
-    private TableColumn dateColumn;
+    private TableColumn<Booking, String> dateColumn;
     @FXML
-    private TableColumn timeColumn;
+    private TableColumn<Booking, String> timeColumn;
     @FXML
-    private TableColumn statusColumn;
+    private TableColumn<Booking, String> statusColumn;
 
     private StaffDashboardController mainController;
     private ResourceBundle resourceBundle;
@@ -33,7 +35,19 @@ public class StaffBookingsController implements Initializable {
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         this.resourceBundle = rb;
-        // Initialization logic for bookings table goes here
+
+        // Corrected: The property name "tourist" now correctly points to the getTourist() method.
+        customerNameColumn.setCellValueFactory(new PropertyValueFactory<>("tourist"));
+        // Corrected: The property name "packageName" now correctly points to the getPackageName() method.
+        attractionNameColumn.setCellValueFactory(new PropertyValueFactory<>("packageName"));
+        dateColumn.setCellValueFactory(new PropertyValueFactory<>("travelDate"));
+        // Assuming there is a time property in Booking model
+        // timeColumn.setCellValueFactory(new PropertyValueFactory<>("time"));
+        // Assuming there is a status property in Booking model
+        // statusColumn.setCellValueFactory(new PropertyValueFactory<>("status"));
+
+        // Load bookings from the model and set them in the table
+        bookingTable.setItems(Booking.loadBookings());
     }
 
     @FXML

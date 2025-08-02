@@ -15,9 +15,11 @@ import javafx.scene.control.*;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 
-import java.io.FileReader;
+import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.lang.reflect.Type;
 import java.util.List;
 
@@ -50,58 +52,47 @@ public class GuideController {
     @FXML
     private Button deleteButton;
 
-    // ObservableList to hold the guide data
     private ObservableList<Guide> guideList = FXCollections.observableArrayList();
 
-    // File path to load guide data from
-    private static final String GUIDE_FILE_PATH = "src/main/resources/Data/guides.json";
+    private static final String DATA_DIR = "Data";
+    private static final String GUIDE_FILE_NAME = "guides.json";
+    private static final String GUIDE_FILE_PATH = DATA_DIR + File.separator + GUIDE_FILE_NAME;
 
-    // Initialize the GuideTableView with the data
     @FXML
     public void initialize() {
-        // Initialize the columns with proper property bindings
         idColumn.setCellValueFactory(cellData -> cellData.getValue().idProperty());
         nameColumn.setCellValueFactory(cellData -> cellData.getValue().nameProperty());
         contactColumn.setCellValueFactory(cellData -> cellData.getValue().contactProperty());
         emailColumn.setCellValueFactory(cellData -> cellData.getValue().emailProperty());
         nationalityColumn.setCellValueFactory(cellData -> cellData.getValue().nationalityProperty());
 
-        // Load and display guide data
         loadGuideData();
     }
 
-    /**
-     * Loads guide data from the JSON file.
-     */
     private void loadGuideData() {
-        try (FileReader reader = new FileReader(GUIDE_FILE_PATH)) {
+        try (InputStream is = getClass().getResourceAsStream("/Data/guides.json");
+             InputStreamReader reader = new InputStreamReader(is)) {
+
             Gson gson = new GsonBuilder()
-                .setPrettyPrinting()
-                .excludeFieldsWithoutExposeAnnotation()
-                .create();
-            Type guideListType = new TypeToken<List<Guide>>(){}.getType();
+                    .setPrettyPrinting()
+                    .excludeFieldsWithoutExposeAnnotation()
+                    .create();
+            Type guideListType = new TypeToken<List<Guide>>() {}.getType();
             List<Guide> guideData = gson.fromJson(reader, guideListType);
 
-            // Clear the existing list
             guideList.clear();
 
-            // Add guides to the ObservableList
             if (guideData != null) {
                 guideList.addAll(guideData);
             }
 
-            // Set the table items to the guide list
             guideTable.setItems(guideList);
 
-        } catch (IOException e) {
-            e.printStackTrace();
-            showAlert("Error", "Failed to load guide data from the file.");
+        } catch (Exception e) {
+            System.err.println("Failed to load guide data from the file.");
         }
     }
 
-    /**
-     * Handles adding a new guide by opening a dialog box.
-     */
     @FXML
     private void handleAddGuide(ActionEvent event) {
         try {
@@ -115,7 +106,7 @@ public class GuideController {
             dialogStage.setScene(new Scene(root));
 
             GuideDialogBoxController dialogController = loader.getController();
-            dialogController.setGuideController(this); // Pass a reference to this controller
+            dialogController.setGuideController(this);
 
             dialogStage.showAndWait();
 
@@ -125,13 +116,9 @@ public class GuideController {
         }
     }
 
-    /**
-     * This method is called by the GuideDialogBoxController when a new guide is created.
-     * @param newGuide The new guide object to add to the table.
-     */
     public void addNewGuide(Guide newGuide) {
         guideList.add(newGuide);
-        saveGuideData(); // Save the updated list to the file
+        saveGuideData();
     }
 
     @FXML
@@ -150,7 +137,7 @@ public class GuideController {
 
                 GuideDialogBoxController dialogController = loader.getController();
                 dialogController.setGuideController(this);
-                dialogController.setGuideForUpdate(selectedGuide); // Pass the selected guide for updating
+                dialogController.setGuideForUpdate(selectedGuide);
 
                 dialogStage.showAndWait();
 
@@ -163,26 +150,20 @@ public class GuideController {
         }
     }
 
-    /**
-     * This method is called by the GuideDialogBoxController when a guide is updated.
-     * @param updatedGuide The updated guide object.
-     */
     public void updateGuide(Guide updatedGuide) {
-        // Find and replace the guide in the list
         for (int i = 0; i < guideList.size(); i++) {
             if (guideList.get(i).getId().equals(updatedGuide.getId())) {
                 guideList.set(i, updatedGuide);
                 break;
             }
         }
-        saveGuideData(); // Save the updated list to the file
+        saveGuideData();
     }
 
     @FXML
     private void handleDeleteGuide(ActionEvent event) {
         Guide selectedGuide = guideTable.getSelectionModel().getSelectedItem();
         if (selectedGuide != null) {
-            // Show confirmation dialog
             Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
             alert.setTitle("Confirm Delete");
             alert.setHeaderText(null);
@@ -198,17 +179,20 @@ public class GuideController {
         }
     }
 
-    /**
-     * Saves the guide data back to the JSON file.
-     */
     private void saveGuideData() {
-        try (FileWriter writer = new FileWriter(GUIDE_FILE_PATH)) {
+        File dataDir = new File(DATA_DIR);
+        if (!dataDir.exists()) {
+            dataDir.mkdir();
+        }
+        File guidesFile = new File(DATA_DIR, GUIDE_FILE_NAME);
+
+        try (FileWriter writer = new FileWriter(guidesFile)) {
             Gson gson = new GsonBuilder()
-                .setPrettyPrinting()
-                .excludeFieldsWithoutExposeAnnotation()
-                .create();
+                    .setPrettyPrinting()
+                    .excludeFieldsWithoutExposeAnnotation()
+                    .create();
             gson.toJson(guideList, writer);
-            System.out.println("Guide data saved to " + GUIDE_FILE_PATH);
+            System.out.println("Guide data saved to " + guidesFile.getAbsolutePath());
 
         } catch (IOException e) {
             e.printStackTrace();
@@ -223,4 +207,4 @@ public class GuideController {
         alert.setContentText(message);
         alert.showAndWait();
     }
-} 
+}

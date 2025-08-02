@@ -14,6 +14,7 @@ import javafx.stage.Stage;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStreamReader; // Added import
 import java.io.File;
 import java.lang.reflect.Type;
 import java.time.LocalDate;
@@ -22,15 +23,15 @@ import java.util.List;
 
 public class BookingDialogBoxController {
 
-    @FXML private TextField idField;  // Changed to TextField instead of Text
+    @FXML private TextField idField;
     @FXML private TextField touristField;
     @FXML private TextField packageField;
     @FXML private ComboBox<Guide> guideComboBox;
     @FXML private DatePicker travelDateField;
     @FXML private TextField amountField;
 
-    private static final String JSON_FILE = "bookings.json";  // Path to save the JSON file
-    private static final String GUIDE_FILE_PATH = "src/main/resources/Data/guides.json";
+    private static final String JSON_FILE = "bookings.json";
+    private static final String GUIDE_FILE_PATH = "/Data/guides.json"; // Corrected file path
 
     private Booking savedBooking;
     private ObservableList<Guide> guideList = FXCollections.observableArrayList();
@@ -47,20 +48,18 @@ public class BookingDialogBoxController {
         isUpdateMode = false;
         bookingForUpdate = null;
         resetFields();
-        // Set a default ID for new booking
         idField.setText(String.valueOf(getNextBookingId()));
     }
 
     public void setUpdateMode(Booking booking) {
         isUpdateMode = true;
         bookingForUpdate = booking;
-        
-        // Populate fields with existing data
+
         idField.setText(String.valueOf(booking.getId()));
         touristField.setText(booking.getTourist());
-        packageField.setText(booking.getPackage());
-        
-        // Set guide if exists
+        // Corrected: Uses getPackageName() to match the Booking model
+        packageField.setText(booking.getPackageName());
+
         if (booking.getGuide() != null && !booking.getGuide().isEmpty()) {
             for (Guide guide : guideList) {
                 if (guide.getName().equals(booking.getGuide())) {
@@ -69,12 +68,11 @@ public class BookingDialogBoxController {
                 }
             }
         }
-        
-        // Set travel date
+
         if (booking.getTravelDate() != null) {
             travelDateField.setValue(booking.getTravelDate());
         }
-        
+
         amountField.setText(String.valueOf(booking.getAmount()));
     }
 
@@ -89,7 +87,7 @@ public class BookingDialogBoxController {
     }
 
     private void loadGuides() {
-        try (FileReader reader = new FileReader(GUIDE_FILE_PATH)) {
+        try (InputStreamReader reader = new InputStreamReader(getClass().getResourceAsStream(GUIDE_FILE_PATH))) {
             Gson gson = new GsonBuilder()
                 .excludeFieldsWithoutExposeAnnotation()
                 .create();
@@ -100,7 +98,7 @@ public class BookingDialogBoxController {
             if (guideData != null) {
                 guideList.addAll(guideData);
             }
-        } catch (IOException e) {
+        } catch (Exception e) {
             System.out.println("No guides found or error loading guides: " + e.getMessage());
         }
     }
@@ -121,10 +119,8 @@ public class BookingDialogBoxController {
         guideComboBox.setButtonCell(guideComboBox.getCellFactory().call(null));
     }
 
-    // Called when the "Save" button is pressed
     @FXML
     private void handleSaveBooking() {
-        // Validate all the fields are filled
         if (validateFields()) {
             String touristName = touristField.getText();
             String packageName = packageField.getText();
@@ -132,9 +128,8 @@ public class BookingDialogBoxController {
             LocalDate travelDate = travelDateField.getValue();
             String amount = amountField.getText();
 
-            // Create a booking object
             savedBooking = new Booking(
-                    Integer.parseInt(idField.getText()),  // Parse ID from TextField
+                    Integer.parseInt(idField.getText()),
                     touristName,
                     packageName,
                     guide,
@@ -142,34 +137,28 @@ public class BookingDialogBoxController {
                     Double.parseDouble(amount)
             );
 
-            // Close the dialog box immediately
             Stage stage = (Stage) touristField.getScene().getWindow();
             stage.close();
         }
     }
 
-    // Called when the "Cancel" button is pressed
     @FXML
     private void handleCancel() {
-        // Optionally reset fields or close the dialog box
         resetFields();
         Stage stage = (Stage) touristField.getScene().getWindow();
         stage.close();
     }
 
-    // Validate that all the required fields are filled
     private boolean validateFields() {
         if (touristField.getText().isEmpty() || packageField.getText().isEmpty() ||
                 travelDateField.getValue() == null || amountField.getText().isEmpty()) {
 
-            // Show an alert if validation fails
             showAlert("Validation Error", "Tourist name, package, travel date, and amount are required!");
             return false;
         }
         return true;
     }
 
-    // Reset all fields after cancellation
     private void resetFields() {
         touristField.clear();
         packageField.clear();
@@ -178,7 +167,6 @@ public class BookingDialogBoxController {
         amountField.clear();
     }
 
-    // Show an alert dialog
     private void showAlert(String title, String message) {
         Alert alert = new Alert(Alert.AlertType.WARNING);
         alert.setTitle(title);
@@ -187,20 +175,13 @@ public class BookingDialogBoxController {
         alert.showAndWait();
     }
 
-    // Save the booking details to a JSON file
     private void saveBookingToJson(Booking booking) {
         try {
-            // Read existing bookings from the JSON file if it exists
             List<Booking> bookings = loadBookingsFromJson();
-
-            // Add the new booking to the list
             bookings.add(booking);
-
-            // Create a Gson object to convert the list into JSON
             Gson gson = new Gson();
             String json = gson.toJson(bookings);
 
-            // Write the JSON to a file
             try (FileWriter writer = new FileWriter(JSON_FILE)) {
                 writer.write(json);
                 System.out.println("Booking saved to JSON file!");
@@ -211,10 +192,8 @@ public class BookingDialogBoxController {
         }
     }
 
-    // Load existing bookings from the JSON file
     private List<Booking> loadBookingsFromJson() {
         List<Booking> bookings = new ArrayList<>();
-
         try {
             File file = new File(JSON_FILE);
             if (file.exists()) {
@@ -224,11 +203,9 @@ public class BookingDialogBoxController {
         } catch (IOException e) {
             e.printStackTrace();
         }
-
         return bookings;
     }
 
-    // Return the saved booking
     public Booking getBooking() {
         return savedBooking;
     }

@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.text.Text?>
+
+<VBox xmlns="http://javafx.com/javafx"
+      xmlns:fx="http://javafx.com/fxml"
+      fx:controller="Admin.BookingDialogBoxController"
+      prefHeight="300.0" prefWidth="400.0" spacing="10" AnchorPane.topAnchor="10" AnchorPane.leftAnchor="10" AnchorPane.rightAnchor="10" AnchorPane.bottomAnchor="10">
+    <!-- Title -->
+    <Text text="Booking Details" style="-fx-font-weight: bold; -fx-font-size: 16px;" />
+
+    <!-- Form Fields -->
+    <Label text="Booking ID:" />
+    <TextField fx:id="idField" />
+
+    <Label text="Tourist Name:" />
+    <TextField fx:id="touristField" />
+
+    <Label text="Package:" />
+    <TextField fx:id="packageField" />
+
+    <Label text="Guide:" />
+    <TextField fx:id="guideField" />
+
+    <Label text="Travel Date:" />
+    <DatePicker fx:id="travelDateField" />
+
+    <Label text="Amount:" />
+    <TextField fx:id="amountField" />
+
+    <!-- Buttons -->
+    <HBox spacing="10" AnchorPane.bottomAnchor="10">
+        <Button text="Save" onAction="#handleSaveBooking" />
+        <Button text="Cancel" onAction="#handleCancel" />
+    </HBox>
+</VBox>

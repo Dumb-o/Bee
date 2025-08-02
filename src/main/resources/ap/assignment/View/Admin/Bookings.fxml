@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<?import javafx.geometry.Insets?>
+<AnchorPane xmlns="http://javafx.com/javafx"
+            xmlns:fx="http://javafx.com/fxml"
+            fx:controller="Admin.BookingsController"
+            prefHeight="400.0" prefWidth="600.0">
+
+    <VBox spacing="10" prefWidth="600" prefHeight="400">
+
+        <padding>
+            <Insets top="10" right="10" bottom="10" left="10"/>
+        </padding>
+
+        <Label text="All Bookings" style="-fx-font-weight: bold; -fx-font-size: 14px;" />
+
+        <HBox spacing="10">
+            <Button fx:id="addButton" text="Add Booking" onAction="#handleAddBooking" />
+            <Button fx:id="updateButton" text="Update Booking" onAction="#handleUpdateBooking" />
+            <Button fx:id="deleteButton" text="Delete Booking" onAction="#handleDeleteBooking" />
+        </HBox>
+
+        <TableView fx:id="bookingsTable">
+            <columns>
+                <TableColumn fx:id="idColumn" text="Booking ID" prefWidth="80" />
+                <TableColumn fx:id="touristColumn" text="Tourist" prefWidth="100" />
+                <TableColumn fx:id="packageColumn" text="Package" prefWidth="100" />
+                <TableColumn fx:id="guideColumn" text="Guide" prefWidth="100" />
+                <TableColumn fx:id="travelDateColumn" text="Travel Date" prefWidth="100" />
+                <TableColumn fx:id="amountColumn" text="Amount" prefWidth="80" />
+            </columns>
+        </TableView>
+
+    </VBox>
+</AnchorPane>

@@ -1,0 +1,29 @@
+[
+  {
+    "email": "admin@admin",
+    "name": "Tester",
+    "address": "Test",
+    "nationality": "Test",
+    "phone": "98231738812",
+    "password": "1234",
+    "dob": "12/12/2004"
+  },
+  {
+    "email": "test@test",
+    "name": "Another Staff",
+    "address": "Address 2",
+    "nationality": "Nationality 2",
+    "phone": "1234567890",
+    "password": "1234",
+    "dob": "01/01/1990"
+  },
+  {
+    "email": "final@example.com",
+    "name": "Another Staff",
+    "address": "Address 2",
+    "nationality": "Nationality 2",
+    "phone": "1234567890",
+    "password": "pass2",
+    "dob": "01/01/1990"
+  }
+]

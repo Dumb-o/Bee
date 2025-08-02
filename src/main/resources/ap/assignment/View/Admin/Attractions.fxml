@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+
+<AnchorPane xmlns="http://javafx.com/javafx"
+            xmlns:fx="http://javafx.com/fxml"
+            fx:controller="Admin.AttractionsController"
+            prefHeight="400.0" prefWidth="600.0">
+
+    <VBox spacing="10" AnchorPane.topAnchor="10" AnchorPane.leftAnchor="10" AnchorPane.rightAnchor="10" AnchorPane.bottomAnchor="10">
+        <TableView fx:id="attractionsTable" prefHeight="300">
+            <columns>
+                <TableColumn fx:id="idColumn" text="Attraction ID" prefWidth="100"/>
+                <TableColumn fx:id="nameColumn" text="Name" prefWidth="150"/>
+                <TableColumn fx:id="locationColumn" text="Location" prefWidth="150"/>
+                <TableColumn fx:id="altitudeColumn" text="Altitude" prefWidth="100"/>
+            </columns>
+        </TableView>
+
+        <HBox spacing="10">
+            <Button fx:id="addButton" text="Add Attraction" onAction="#handleAddAttraction"/>
+            <Button fx:id="updateButton" text="Update Attraction" onAction="#handleUpdateAttraction"/>
+            <Button fx:id="deleteButton" text="Delete Attraction" onAction="#handleDeleteAttraction"/>
+        </HBox>
+    </VBox>
+</AnchorPane>

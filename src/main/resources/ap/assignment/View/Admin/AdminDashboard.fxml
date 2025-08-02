@@ -37,7 +37,7 @@
                 </padding>
                 <Button onAction="#setBooking" text="%nav.booking" />
                 <Button onAction="#setStaff" text="%nav.staff" />
-                <Button onAction="#setFestival" text="%nav.guide" />
+                <Button onAction="#setGuide" text="%nav.guide" />
                 <Button onAction="#setAttractions" text="%nav.attractions" />
                 <Button onAction="#setFestival" text="%nav.festival" />
             </HBox>

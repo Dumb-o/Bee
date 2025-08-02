@@ -34,9 +34,6 @@ public class StaffController {
     private TableView<Staff> staffTable;
 
     @FXML
-    private TableColumn<Staff, String> staffIdColumn;
-
-    @FXML
     private TableColumn<Staff, String> nameColumn;
 
     @FXML
@@ -44,9 +41,6 @@ public class StaffController {
 
     @FXML
     private TableColumn<Staff, String> emailColumn;
-
-    @FXML
-    private TableColumn<Staff, String> positionColumn;
 
     @FXML
     private Button addButton;
@@ -67,7 +61,6 @@ public class StaffController {
     @FXML
     public void initialize() {
         // Initialize the columns with proper property bindings
-        staffIdColumn.setCellValueFactory(cellData -> cellData.getValue().emailProperty());
         nameColumn.setCellValueFactory(cellData -> cellData.getValue().nameProperty());
         contactColumn.setCellValueFactory(cellData -> cellData.getValue().phoneProperty());
         emailColumn.setCellValueFactory(cellData -> cellData.getValue().emailProperty());

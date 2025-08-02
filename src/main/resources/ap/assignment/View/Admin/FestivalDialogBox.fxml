@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.DatePicker?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+
+<VBox spacing="10" xmlns="http://javafx.com/javafx/24.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="Admin.FestivalDialogBoxController">
+
+    <padding>
+        <Insets bottom="10" left="10" right="10" top="10" />
+    </padding>
+
+    <!-- Title -->
+    <Label fx:id="titleLabel" style="-fx-font-weight: bold; -fx-font-size: 14px;" text="Add New Festival" />
+
+    <!-- Form -->
+    <GridPane hgap="10" vgap="10">
+
+        <Label text="Festival ID:" GridPane.columnIndex="0" GridPane.rowIndex="0" />
+        <TextField fx:id="idField" GridPane.columnIndex="1" GridPane.rowIndex="0" />
+
+        <Label text="Festival Name:" GridPane.columnIndex="0" GridPane.rowIndex="1" />
+        <TextField fx:id="nameField" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+
+        <Label text="Date From:" GridPane.columnIndex="0" GridPane.rowIndex="2" />
+        <DatePicker fx:id="dateFromPicker" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+
+        <Label text="Date To:" GridPane.columnIndex="0" GridPane.rowIndex="3" />
+        <DatePicker fx:id="dateToPicker" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+
+        <Label text="Discount (%):" GridPane.columnIndex="0" GridPane.rowIndex="4" />
+        <TextField fx:id="discountField" GridPane.columnIndex="1" GridPane.rowIndex="4" />
+
+    </GridPane>
+
+    <!-- Buttons -->
+    <HBox spacing="10" alignment="CENTER_RIGHT">
+        <Button fx:id="saveButton" onAction="#saveFestival" style="-fx-background-color: #4CAF50; -fx-text-fill: white;" text="Save" />
+        <Button fx:id="cancelButton" onAction="#cancelDialog" style="-fx-background-color: #f44336; -fx-text-fill: white;" text="Cancel" />
+    </HBox>
+
+</VBox> 

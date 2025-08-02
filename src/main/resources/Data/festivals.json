@@ -1,0 +1,30 @@
+[
+  {
+    "id": "F001",
+    "name": "Dashain",
+    "dateFrom": "2024-10-15",
+    "dateTo": "2024-10-25",
+    "discount": 15.0
+  },
+  {
+    "id": "F002",
+    "name": "Tihar",
+    "dateFrom": "2024-11-05",
+    "dateTo": "2024-11-09",
+    "discount": 10.0
+  },
+  {
+    "id": "F003",
+    "name": "Holi",
+    "dateFrom": "2024-03-25",
+    "dateTo": "2024-03-26",
+    "discount": 12.0
+  },
+  {
+    "id": "1",
+    "name": "Festival1",
+    "dateFrom": "2023-04-31",
+    "dateTo": "2024-05-32",
+    "discount": 20.0
+  }
+]
